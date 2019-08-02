@@ -41,18 +41,23 @@ class Phone < ApplicationRecord
       Rails.logger.info("Sending SMS to #{phone.number}")
 
       send_sms(number: phone.number,
+               code:  phone.code,
                content: Barong::App.config.sms_content_template.gsub(/{{code}}/, phone.code))
     end
 
-    def send_sms(number:, content:)
+    def send_sms(number:, code:, content:)
       from_phone = Barong::App.config.twilio_phone_number
 
       client = Barong::App.config.sms_sender
-      client.messages.create(
-        from: from_phone,
-        to:   '+' + number,
-        body: content
-      )
+      client.verify
+            .services(Barong::App.config.service)
+            .verifications
+            .create(
+              from: from_phone,
+              to:   '+' + number,
+              channel: 'sms',
+              custom_code: code
+            )
     end
   end
 
