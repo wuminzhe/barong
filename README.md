@@ -13,7 +13,7 @@ Barong is oAuth server for [Openware.com][openware.com] stack.
 # Development
 
 Prerequisites:
-- Ruby version: `2.5.3`
+- Ruby version: `2.6.3`
 - Bundler preinstalled
 - MySQL preinstalled
 
@@ -24,6 +24,8 @@ bundle install
 
 2. Copy initialisation files
 ```
+export DATABASE_PASS=xxx
+export EVENT_API_JWT_PRIVATE_KEY=xxx
 bin/init_config
 ```
 
