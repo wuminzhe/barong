@@ -41,10 +41,37 @@ yarn install
 
 5. Start local server
 ```
-bundle exec rails server
+bundle exec rails server -p 3001
 ```
 
-# Test client application
+# How to use barong
+
+view:  
+```
+<% if session[:access_token] %>
+    <%= link_to 'Get User', "http://localhost:3001/api/account?access_token=#{session[:access_token]}" %>
+    <%= link_to 'Sign out', session_destroy_path, method: 'POST' %>
+<% else %>
+    <%= link_to 'Authorize via Barong', new_oauth_token_path %>
+<% end %>
+```
+
+controller:  
+```
+class SessionsController < ApplicationController
+  def create
+    req_params = "client_id=#{ENV['oauth_token']}&client_secret=#{ENV['oauth_secret']}&code=#{params[:code]}&grant_type=authorization_code&redirect_uri=#{ENV['oauth_redirect_uri']}"
+    response = JSON.parse RestClient.post("#{ENV['server_base_url']}/oauth/token", req_params)
+    session[:access_token] = response['access_token']
+    redirect_to root_path
+  end
+
+  def destroy
+    session[:access_token] = nil
+    redirect_to root_path
+  end
+end
+```
 
 You can find example of Barong usage here: [Barong Test Client App](https://github.com/rubykube/barong-client-app)
 
